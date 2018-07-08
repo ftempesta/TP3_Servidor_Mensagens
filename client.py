@@ -44,9 +44,6 @@ mensagem = "mesagem a ser enviada"
 while True:
     readable, writable, exceptional = select.select([udp, sys.stdin], [], [])
     for controlador in readable:
-        print(controlador)
-        print(readable)
-
         if(controlador == udp):
             print("Recebendo uma mensagem")
             RecebeMensagem()
