@@ -1,31 +1,18 @@
-#abre o servidor = ok
-#cliente conecta = ok
-#cliente escreve uma mensagme qualquer e envia pro servidor = ok
-
-#servidor le e tem 4 opcoes:
-#mensagem enviada pelo cliente é um +, -, #, qualquer
-#o serviddor trata a mensagem recebida e caso seja um + ou -, coloca na tabela interna pra saber qual usuario tem qual interesse
-#ao retransmitir a mensagem, é verificado pra quem enviar olhando nessa tabela
-#caso seja um #, olhe na tabela e envie pra todos q tem interesse
-#se for qualquer, envia pra todo mundo
-# eu tenho interesse com a # brasil
-# mas alguem manda mensagem: "oi gente"
-# "oi gente #brasil" <== só pra quem deu +brasil
-# "oi gente" < == pra todo mundo
-
-#-------------------------------------------------------------------------------------------------------------------------------------------
-
-
 #CLIENT.PY
 import select
 import socket
 import sys
 
+#Funcao de receber mensagem
 def RecebeMensagem():
+    #recebe por meio do udp
     mensagemRecebida, endereco = udp.recvfrom(502)
+    #verifica se nao veio uma mensagem vazia
     if(mensagemRecebida != ""):
+        #decodifica a mensagem
         mensagemRecebida=bytes.decode(mensagemRecebida)
-        print('mensagemRecebido')
+        #printa a mensagem pro usuario
+        print(mensagemRecebida)
   
 
 #porta do cliente
@@ -40,22 +27,24 @@ udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 destino = ("127.0.0.1", localPort)
 udp.bind(destino)
 
-mensagem = "mesagem a ser enviada"
 while True:
+    #Cria o select
     readable, writable, exceptional = select.select([udp, sys.stdin], [], [])
     for controlador in readable:
+        #se o controlador for um udp, ele esta recebendo a mensagem
         if(controlador == udp):
-            print("Recebendo uma mensagem")
+            #chama a funcao de receber mensagens
             RecebeMensagem()
             continue
+        #se o controlador for um stdin, esta recebendo input do usuario
         if(controlador == sys.stdin):
-            #envia mensagem pro servidor
+            #le a linha inteira de input do usuario
             mensagem = sys.stdin.readline()
-            #essa mensagem é enviada para o servidorm
+            #essa mensagem é enviada para o servidor
             destino = (serverIp, serverPort)
             udp.sendto(bytes(mensagem,'utf-8'), destino)
             continue            
 
-        
+#fecha a conexao
 udp.close()
 
